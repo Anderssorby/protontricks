@@ -155,24 +155,19 @@ def find_steam_path():
             or os.path.isdir(os.path.join(path, "SteamApps"))
         )
 
-    # as far as @admalledd can tell,
-    # this should always be correct for the tools root:
-    steam_root = os.path.join(os.path.expanduser("~"), ".steam", "root")
+    def has_ubuntu12_32_dir(path):
+        return os.path.isdir(os.path.join(path, "ubuntu12_32"))
 
-    if not os.path.isdir(os.path.join(steam_root, "ubuntu12_32")):
-        # Check that runtime dir exists, if not make root=path and hope
-        steam_root = None
+    steam_root = None
 
     if os.environ.get("STEAM_DIR"):
         steam_path = os.environ.get("STEAM_DIR")
-        if has_steamapps_dir(steam_path):
+        if has_steamapps_dir(steam_path) and has_ubuntu12_32_dir(steam_path):
             logger.info(
                 "Found a valid Steam installation at {}.".format(steam_path)
             )
 
-            if not steam_root:
-                steam_root = steam_path
-            return steam_path, steam_root
+            return steam_path, steam_path
 
         logger.error(
             "$STEAM_DIR was provided but didn't point to a valid Steam "
@@ -180,6 +175,14 @@ def find_steam_path():
         )
 
         return None, None
+
+    # as far as @admalledd can tell,
+    # this should always be correct for the tools root:
+    steam_root = os.path.join(os.path.expanduser("~"), ".steam", "root")
+
+    if not os.path.isdir(os.path.join(steam_root, "ubuntu12_32")):
+        # Check that runtime dir exists, if not make root=path and hope
+        steam_root = None
 
     for steam_path in COMMON_STEAM_DIRS:
         if has_steamapps_dir(steam_path):
