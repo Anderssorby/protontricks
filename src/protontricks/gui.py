@@ -45,6 +45,8 @@ def select_steam_app_with_gui(steam_apps):
             logger.info("Ignoring zenity crash bug")
             choice = exc.stdout
         else:
+            print(exc.stderr)
+            print(exc.stdout)
             raise RuntimeError("Zenity returned an error")
     except OSError:
         raise RuntimeError("Zenity was not found")
