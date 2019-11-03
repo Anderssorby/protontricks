@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+### Added
+ - Non-Steam shortcuts are now discovered, although without the actual shortcut name
+
 ## [1.2.5] - 2019-09-17
 ### Fixed
  - Fix regression in 1.2.3 that broke detection of custom Proton installations.

@@ -575,6 +575,55 @@ def get_custom_proton_installations(steam_root):
     return custom_proton_apps
 
 
+def get_non_steam_shortcuts(steam_root):
+    """
+    Return a list of non-Steam shortcuts as a list of SteamApp objects
+    """
+    compatdata_dir = os.path.join(steam_root, "steamapps", "compatdata")
+
+    if not os.path.isdir(compatdata_dir):
+        return []
+
+    compatdata_dirs = glob.glob(
+        os.path.join(compatdata_dir, "*")
+    )
+
+    nonsteam_apps = []
+
+    for compatdata_path in compatdata_dirs:
+        compatdata_name = os.path.split(compatdata_path)[1]
+
+        try:
+            appid = int(compatdata_name)
+        except ValueError:
+            # Not a Wine prefix directory
+            continue
+
+        if appid < 2147483648:
+            # Not a non-Steam shortcut
+            # Assume every app ID less than 2147483648 is an actual Steam app.
+            # In practice, 2147483651 has been the first ID in the sequence,
+            # but let's stay on the safe side here, since
+            # (2**32) / 2 == 2147483648, and that doesn't seem to be a
+            # coincidence
+            continue
+
+        compatdata_path = os.path.join(compatdata_dir, compatdata_name)
+
+        nonsteam_apps.append(
+            SteamApp(
+                appid=appid,
+                name="Non-Steam shortcut: app ID {}".format(appid),
+                prefix_path=os.path.join(compatdata_path, "pfx"),
+                # Not the actual install path, but we need to put at least
+                # something here
+                install_path=compatdata_path
+            )
+        )
+
+    return nonsteam_apps
+
+
 def get_steam_apps(steam_root, steam_lib_paths):
     """
     Find all the installed Steam apps and return them as a list of SteamApp
@@ -601,6 +650,7 @@ def get_steam_apps(steam_root, steam_lib_paths):
 
     # Get the custom Proton installations as well
     steam_apps += get_custom_proton_installations(steam_root=steam_root)
+    steam_apps += get_non_steam_shortcuts(steam_root=steam_root)
 
     # Exclude games that haven't been launched yet
     steam_apps = [
