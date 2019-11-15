@@ -512,6 +512,7 @@ def get_steam_lib_paths(steam_path):
         logger.info(
             "Found {} Steam library folders".format(len(library_folders))
         )
+        logger.info("Steam library folders: %s", library_folders)
         return library_folders
 
     # Try finding Steam library folders using libraryfolders.vdf in Steam root
@@ -711,10 +712,14 @@ def get_steam_apps(steam_root, steam_path, steam_lib_paths):
             )
 
         for manifest_path in appmanifest_paths:
+            logger.info("Checking appmanifest %s", manifest_path)
             steam_app = SteamApp.from_appmanifest(
                 manifest_path, steam_lib_paths=steam_lib_paths
             )
             if steam_app:
+                logger.info(
+                    "Found app %s. Has prefix: %s.",
+                    steam_app.name, steam_app.prefix_path_exists)
                 steam_apps.append(steam_app)
 
     # Get the custom Proton installations and non-Steam shortcuts as well
