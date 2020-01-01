@@ -477,11 +477,6 @@ class MockSubprocess:
         self.env = env
 
 
-class MockResult:
-    def __init__(self, stdout):
-        self.stdout = stdout
-
-
 @pytest.fixture(scope="function", autouse=True)
 def zenity(monkeypatch):
     """
@@ -490,15 +485,15 @@ def zenity(monkeypatch):
     """
     mock_zenity = MockSubprocess()
 
-    def mock_subprocess_run(args, **kwargs):
+    def mock_subprocess_check_output(args, **kwargs):
         mock_zenity.args = args
         mock_zenity.kwargs = kwargs
 
-        return MockResult(stdout=mock_zenity.mock_stdout.encode("utf-8"))
+        return mock_zenity.mock_stdout.encode("utf-8")
 
     monkeypatch.setattr(
-        "protontricks.gui.run",
-        mock_subprocess_run
+        "protontricks.gui.check_output",
+        mock_subprocess_check_output
     )
 
     yield mock_zenity
@@ -512,16 +507,16 @@ def command(monkeypatch):
     """
     mock_command = MockSubprocess()
 
-    def mock_subprocess_run(args, **kwargs):
+    def mock_subprocess_call(args, **kwargs):
         mock_command.args = args
         mock_command.kwargs = kwargs
         mock_command.env = os.environ.copy()
 
-        return MockResult(stdout=b"")
+        return 0
 
     monkeypatch.setattr(
-        "protontricks.util.run",
-        mock_subprocess_run
+        "protontricks.util.call",
+        mock_subprocess_call
     )
 
     yield mock_command

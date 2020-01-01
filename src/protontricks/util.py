@@ -1,6 +1,6 @@
 import logging
 import os
-from subprocess import run, check_output
+from subprocess import call, check_output
 
 __all__ = ("run_command",)
 
@@ -81,7 +81,7 @@ def run_command(
     logger.info("Attempting to run command %s", command)
 
     try:
-        run(command, **kwargs)
+        call(command, **kwargs)
     finally:
         # Restore original env vars
         os.environ.clear()

@@ -11,7 +11,7 @@ def broken_zenity(zenity, monkeypatch):
     the following GitHub issue:
     https://github.com/Matoking/protontricks/issues/20
     """
-    def mock_subprocess_run(args, **kwargs):
+    def mock_subprocess_check_output(args, **kwargs):
         zenity.args = args
 
         raise CalledProcessError(
@@ -22,8 +22,8 @@ def broken_zenity(zenity, monkeypatch):
         )
 
     monkeypatch.setattr(
-        "protontricks.gui.run",
-        mock_subprocess_run
+        "protontricks.gui.check_output",
+        mock_subprocess_check_output
     )
 
     yield zenity
