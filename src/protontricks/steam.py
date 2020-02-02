@@ -3,8 +3,10 @@ import glob
 import logging
 import os
 import re
+import sre_constants
 import string
 import struct
+import sys
 import zlib
 from pathlib import Path
 
@@ -757,14 +759,21 @@ def get_steam_apps(steam_root, steam_path, steam_lib_paths):
 
     for path in steam_lib_paths:
         appmanifest_paths = []
-        if os.path.isdir(os.path.join(path, "steamapps")):
-            appmanifest_paths = glob.glob(
-                os.path.join(path, "steamapps", "appmanifest_*.acf")
-            )
-        elif os.path.isdir(os.path.join(path, "SteamApps")):
-            appmanifest_paths = glob.glob(
-                os.path.join(path, "SteamApps", "appmanifest_*.acf")
-            )
+        try:
+            if os.path.isdir(os.path.join(path, "steamapps")):
+                appmanifest_paths = glob.glob(
+                    os.path.join(path, "steamapps", "appmanifest_*.acf")
+                )
+            elif os.path.isdir(os.path.join(path, "SteamApps")):
+                appmanifest_paths = glob.glob(
+                    os.path.join(path, "SteamApps", "appmanifest_*.acf")
+                )
+        except sre_constants.error as exc:
+            print("catched error ")
+            print(str(exc))
+            print(path)
+            print(os.path.join(path, "steamapps", "appmanifest_*.acf"))
+            sys.exit(0)
 
         for manifest_path in appmanifest_paths:
             steam_app = SteamApp.from_appmanifest(
